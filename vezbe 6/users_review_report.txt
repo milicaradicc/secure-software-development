@@ -1,0 +1,74 @@
+========================================================
+   LINUX SECURITY AUDIT — USERS REVIEW MODULE
+   Host:    PC
+   Date:    Tue May 26 15:32:00 CEST 2026
+   Run by:  root (UID 0)
+========================================================
+
+========================================================
+  1) /etc/passwd REVIEW
+========================================================
+
+--- Accounts with UID = 0 (root equivalents) ---
+  [OK]       Only 'root' has UID 0 (expected state)
+
+--- Duplicate UIDs ---
+  [OK]       No duplicate UIDs
+
+--- Users with an interactive shell ---
+  [INFO]     root (UID 0) -> /bin/bash
+  [INFO]     mijat (UID 1000) -> /bin/bash
+
+========================================================
+  2) /etc/shadow REVIEW
+========================================================
+
+--- Password hashing algorithms (only accounts with an active password) ---
+  [OK]       mijat: yescrypt (modern default)
+
+--- Accounts WITHOUT a password (empty field) ---
+  [OK]       No accounts with an empty password
+
+--- Locked accounts (info) ---
+  [INFO]     27 locked/disabled accounts (usually expected for system accounts)
+
+--- Password aging policy (user accounts, UID >= 1000) ---
+  [WARN]     mijat: password never expires (max=99999). Recommendation: 90 days.
+
+========================================================
+  3) PAM PASSWORD POLICY
+========================================================
+  [INFO]     Reading configuration from: /etc/pam.d/common-password
+
+--- Password quality module ---
+  [CRITICAL] No password quality module (cracklib/pwquality) is active!
+  [INFO]     Recommendation: 'apt-get install libpam-cracklib' (Debian) or 'libpwquality' (RHEL)
+
+--- Default hashing algorithm (pam_unix.so) ---
+  [OK]       yescrypt (recommended)
+
+========================================================
+  4) SUDO CONFIGURATION
+========================================================
+  [INFO]     Files analyzed:/etc/sudoers /etc/sudoers.d/README
+
+--- NOPASSWD rules (sudo without a password) ---
+  [OK]       No NOPASSWD rules
+
+--- Unrestricted sudo access (ALL=(ALL) ALL) ---
+  [OK]       [/etc/sudoers] root has full access (expected)
+
+--- Dangerous commands in sudo configuration ---
+  [OK]       No obviously dangerous commands in sudoers files
+
+--- Members of sudo / wheel groups ---
+  [INFO]     Group 'sudo': mijat
+
+========================================================
+  5) SSH AUTHORIZED_KEYS CHECK
+========================================================
+
+========================================================
+  Review complete.
+  Legend: [OK] = good  [WARN] = needs review  [CRITICAL] = fix immediately
+========================================================
