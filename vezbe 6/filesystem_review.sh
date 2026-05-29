@@ -32,7 +32,7 @@ else
     RED=""; YEL=""; GRN=""; CYA=""; BLD=""; RST=""
 fi
 
-# Helper functions for consistent output formatting (same style as users_review.sh)
+# Helper functions for consistent output formatting 
 print_section() {
     echo ""
     echo -e "${CYA}========================================================${RST}"
@@ -119,7 +119,6 @@ check_fstab() {
     fi
 }
 
-##############################################################################
 # 2) SENSITIVE FILE PERMISSIONS
 # Why this matters:
 #   Files containing secrets (password hashes, private keys, DB credentials)

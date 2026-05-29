@@ -1,99 +1,92 @@
-# Filesystem Review Module — Documentation
+# Filesystem Review Module
 
-**Script:** `filesystem_review.sh`
-**Scope (one student):** Filesystem hardening review — chapter 6 ("FILESYSTEM
-REVIEW") of the *Secure Deployment Environment* material.
+**Skripta:** `filesystem_review.sh`
 
-This module is a companion to `users_review.sh` (users/PAM/sudo) and
-`secure-deploy-audit.sh` (network/SSH/firewall). It covers the part of the
-LinPEAS-style review that those two do not: how the filesystem itself is
-configured and whether file permissions expose the system.
+Alat je **read-only (samo za čitanje) i odbrambeni**. Koristi isključivo
+standardne, legitimne sistemske komande (`cat`, `ls`, `stat`, `find`, `awk`,
+`grep`, `mount`) po **LOTL (Living Off The Land)** pristupu. Ne menja fajlove,
+ne eksploatiše ranjivosti i ne izvodi nikakve napadačke radnje. Neke provere
+skeniraju ceo fajl sistem ili čitaju zaštićene fajlove, pa su potpunije kada
+se pokrenu kao root.
 
-The tool is **read-only and defensive**. It uses only standard, legitimate
-system commands (`cat`, `ls`, `stat`, `find`, `awk`, `grep`, `mount`) following
-the **LOTL (Living Off The Land)** approach. It does not modify files, does not
-exploit anything, and performs no offensive actions. Some checks scan the whole
-filesystem or read protected files, so they are more complete when run as root.
-
-## How to run
+## Kako se pokreće
 
 ```bash
-# from the audited system, working in /tmp as suggested by the material
+# na sistemu koji se pregleda, radi se u /tmp
 cd /tmp
-cp /path/to/filesystem_review.sh .
+cp /putanja/do/filesystem_review.sh .
 chmod +x filesystem_review.sh
 
-# run and save the output for the report
+# pokretanje i čuvanje izlaza za izveštaj
 sudo ./filesystem_review.sh 2>&1 | tee "Filesystem-$(hostname)-$(date +"%d-%b-%Y_%H-%M").txt"
 ```
 
-Output uses the same legend as the other modules:
-`[OK]` = good, `[INFO]` = context only, `[WARN]` = review this, `[CRITICAL]` = fix.
+`[OK]` = u redu, `[INFO]` = samo kontekst, `[WARN]` = pregledati, `[CRITICAL]` = ispraviti.
 
-## Implemented checks
+## Implementirane provere
 
-| # | Check | Commands used | Security issue it helps identify |
+| # | Provera | Korišćene komande | Bezbednosni problem koji pomaže da se uoči |
 | --- | --- | --- | --- |
-| 1 | Mount options in `/etc/fstab` | `awk`, `grep` | Missing `noexec`/`nosuid`/`nodev` on `/tmp`, `/var/tmp`, `/home`, `/dev/shm` lets users run dropped binaries or abuse planted setuid files. `noatime` removes access-time data useful in an intrusion investigation. |
-| 2 | Sensitive file permissions | `stat`, `find` | World-readable `/etc/shadow`, `my.cnf`, SSL private keys, etc. leak password hashes and secrets. A single readable copy defeats correct permissions on the original. |
-| 3 | setuid / setgid binaries | `find / -perm -4000`, `find / -perm -2000` | A setuid-root binary runs as root no matter who starts it. Any unexpected one is a potential privilege-escalation path, so the list should be minimal and trusted. |
-| 4 | World-writable files & directories | `find / -perm -0002` | Files writable by any user can be altered by an attacker (web shell / defacement in `/var/www`, root compromise if a root-run script is writable). World-writable directories without the sticky bit let any user delete others' files. |
-| 5 | Insecure backups | `stat`, `find` | Backups often contain copies of `/etc/shadow`, keys or databases. A world-readable backup file or `/backup` directory lets an attacker extract secrets even when originals are protected. |
+| 1 | Mount opcije u `/etc/fstab` | `awk`, `grep` | Nedostatak `noexec`/`nosuid`/`nodev` na `/tmp`, `/var/tmp`, `/home`, `/dev/shm` dozvoljava korisnicima da pokreću ubačene programe ili zloupotrebe podmetnute setuid fajlove. `noatime` uklanja podatke o vremenu pristupa korisne pri istrazi upada. |
+| 2 | Permisije osetljivih fajlova | `stat`, `find` | Fajlovi čitljivi za sve, poput `/etc/shadow`, `my.cnf`, SSL privatnih ključeva, odaju heševe lozinki i tajne. Već jedna čitljiva kopija poništava ispravne permisije na originalu. |
+| 3 | setuid / setgid binarni fajlovi | `find / -perm -4000`, `find / -perm -2000` | setuid-root program radi kao root bez obzira ko ga pokrene. Svaki neočekivani je potencijalni put za eskalaciju privilegija, pa lista treba da bude minimalna i poverljiva. |
+| 4 | World-writable fajlovi i direktorijumi | `find / -perm -0002` | Fajlove u koje svako može da piše napadač može da izmeni (web shell / izmena sajta u `/var/www`, kompromitacija root-a ako je skripta koju root pokreće upisiva). World-writable direktorijumi bez sticky bita dozvoljavaju bilo kom korisniku da briše tuđe fajlove. |
+| 5 | Nesigurni backup-ovi | `stat`, `find` | Backup-ovi često sadrže kopije `/etc/shadow`, ključeva ili baza. Backup fajl ili `/backup` direktorijum čitljiv za sve omogućava napadaču da izvuče tajne čak i kada su originali zaštićeni. |
 
-## Detail per check
+## Detalji po proveri
 
-### 1. Mount options (`/etc/fstab`)
+### 1. Mount opcije (`/etc/fstab`)
 
-For each of `/tmp`, `/var/tmp`, `/home`, `/dev/shm` the script reads the 4th
-field (mount options) of the matching `/etc/fstab` line and reports which of the
-recommended options (`noexec`, `nosuid`, `nodev`) are missing. If the mount
-point is not a separate partition, this is reported as informational (the
-options are inherited from `/`). It also lists any partition using `noatime`,
-which the material flags as undesirable on sensitive systems because it removes
-inode access-time information used during incident response.
+Za svaku od tačaka `/tmp`, `/var/tmp`, `/home`, `/dev/shm` skripta čita 4. polje
+(mount opcije) odgovarajuće linije u `/etc/fstab` i prijavljuje koje od
+preporučenih opcija (`noexec`, `nosuid`, `nodev`) nedostaju. Ako tačka montiranja
+nije zasebna particija, to se prijavljuje kao informativno (opcije se nasleđuju
+od korenske `/`). Takođe navodi svaku particiju koja koristi `noatime`, koju
+materijal označava kao nepoželjnu na osetljivim sistemima jer uklanja informaciju
+o vremenu pristupa inode-u koja se koristi pri reagovanju na incidente.
 
-### 2. Sensitive file permissions
+### 2. Permisije osetljivih fajlova
 
-Checks a list of known-sensitive files (`/etc/shadow`, `/etc/gshadow`,
-`/etc/sudoers`, MySQL config files, GRUB config) and reports `[CRITICAL]` if the
-"other" permission bits allow access. It then searches common key locations
-(`/etc/ssh`, `/etc/ssl/private`, web-server SSL directories) for `*.key`,
-`*.pem` and `*_key` files and flags any that are accessible beyond the owner.
-This directly reflects the material's point that private keys and password files
-must never be readable by ordinary users.
+Proverava listu poznatih osetljivih fajlova (`/etc/shadow`, `/etc/gshadow`,
+`/etc/sudoers`, MySQL konfiguracioni fajlovi, GRUB konfiguracija) i prijavljuje
+`[CRITICAL]` ako bitovi permisija za „ostale" (other) dozvoljavaju pristup.
+Zatim pretražuje uobičajene lokacije ključeva (`/etc/ssh`, `/etc/ssl/private`,
+SSL direktorijume veb servera) za fajlovima `*.key`, `*.pem` i `*_key` i
+označava svaki koji je dostupan i nekom drugom osim vlasniku. Privatni ključevi i fajlovi sa lozinkama
+nikada ne smeju biti čitljivi za obične korisnike.
 
-### 3. setuid / setgid binaries
+### 3. setuid / setgid binarni fajlovi
 
-Runs `find / -perm -4000` (and `-2000` for setgid), comparing each result
-against a baseline of binaries that are normally setuid on a standard Linux
-system. Known binaries are reported `[OK]`; anything else gets a `[WARN]` so it
-can be checked manually. `-xdev` keeps the scan on the local filesystem and
-`2>/dev/null` suppresses the "No such file or directory" noise, exactly as the
-material recommends.
+Pokreće `find / -perm -4000` (i `-2000` za setgid), poredeći svaki rezultat sa
+baznom listom binarnih fajlova koji su normalno setuid na standardnom Linux
+sistemu. Poznati fajlovi se prijavljuju kao `[OK]`; sve ostalo dobija `[WARN]`
+kako bi se ručno proverilo. `-xdev` zadržava pretragu na lokalnom fajl sistemu,
+a `2>/dev/null` potiskuje poruke „No such file or directory".
+### 4. World-writable fajlovi i direktorijumi
 
-### 4. World-writable files and directories
+Pronalazi obične world-writable fajlove (`-perm -0002`), isključujući virtuelne
+fajl sisteme `/proc`, `/sys`, `/dev`. Sve unutar `/var/www` podiže se na
+`[CRITICAL]` jer upisivi veb koren olakšava
+napredovanje napadaču. Takođe prijavljuje world-writable direktorijume bez
+sticky bita, jer oni dozvoljavaju bilo kom korisniku da briše tuđe fajlove.
+Izlaz je ograničen kako bi se izbeglo nekontrolisano izlistavanje na loše
+podešenim sistemima.
 
-Finds world-writable regular files (`-perm -0002`), excluding the virtual
-filesystems `/proc`, `/sys`, `/dev`. Anything inside `/var/www` is escalated to
-`[CRITICAL]` because the material specifically warns that a writable web root
-eases an attacker's progress. It also reports world-writable directories that
-lack the sticky bit, since those allow any user to delete other users' files.
-Output is capped to avoid runaway listings on misconfigured systems.
+### 5. Nesigurni backup-ovi
 
-### 5. Insecure backups
+Traži zalutale kopije osetljivih fajlova (npr. `/etc/shadow.backup`,
+`/etc/shadow.bak`, `/etc/passwd.bak`) i uobičajene backup direktorijume
+(`/backup`, `/backups`, `/var/backups`). Svaki backup fajl čitljiv za sve — ili
+fajl čitljiv za sve *unutar* backup direktorijuma — prijavljuje se kao
+`[CRITICAL]`, čime se reprodukuje primer iz materijala u kojem napadač čita
+`etc.tgz` iz `/backup` da bi povratio shadow fajl.
 
-Looks for stray copies of sensitive files (e.g. `/etc/shadow.backup`,
-`/etc/shadow.bak`, `/etc/passwd.bak`) and for common backup directories
-(`/backup`, `/backups`, `/var/backups`). Any world-readable backup file — or
-world-readable file *inside* a backup directory — is reported `[CRITICAL]`,
-reproducing the material's example where an attacker reads `etc.tgz` from
-`/backup` to recover the shadow file.
+## Napomene i ograničenja
 
-## Notes and limitations
-
-- Whole-filesystem scans and reading some files require root; without root the
-  results are partial and the script says so.
-- The setuid known-good list is a baseline for common Debian/Ubuntu systems; a
-  `[WARN]` means "verify", not "definitely malicious".
-- The tool reports configuration issues only. It does not change permissions,
-  edit `/etc/fstab`, or remove files — remediation is left to the administrator.
+- Skeniranje celog fajl sistema i čitanje nekih fajlova zahtevaju root; bez
+  root-a su rezultati delimični i skripta to navodi.
+- Bazna lista poznatih setuid fajlova je polazna za uobičajene Debian/Ubuntu
+  sisteme; `[WARN]` znači „proveri", a ne „sigurno je zlonamerno".
+- Alat prijavljuje samo probleme u konfiguraciji. Ne menja permisije, ne
+  uređuje `/etc/fstab` i ne briše fajlove — ispravljanje je prepušteno
+  administratoru.
