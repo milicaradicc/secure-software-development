@@ -1,0 +1,85 @@
+========================================================
+   LINUX SECURITY AUDIT — FILESYSTEM REVIEW MODULE
+   Host:    DESKTOP-IH14E7G
+   Date:    Thu May 28 14:19:46 CEST 2026
+   Run by:  root (UID 0)
+========================================================
+
+========================================================
+  1) MOUNT OPTIONS (/etc/fstab)
+========================================================
+
+--- Hardening options on sensitive mount points ---
+  [INFO]     /tmp is not a separate partition in /etc/fstab (options inherited from /)
+  [INFO]     /var/tmp is not a separate partition in /etc/fstab (options inherited from /)
+  [INFO]     /home is not a separate partition in /etc/fstab (options inherited from /)
+  [INFO]     /dev/shm is not a separate partition in /etc/fstab (options inherited from /)
+
+--- noatime usage (forensic consideration) ---
+  [OK]       No partition uses noatime — access times are preserved
+
+========================================================
+  2) SENSITIVE FILE PERMISSIONS
+========================================================
+
+--- Files that should NOT be world-readable / world-writable ---
+  [OK]       /etc/shadow (root, 640) is not accessible by other users
+  [OK]       /etc/gshadow (root, 640) is not accessible by other users
+  [OK]       /etc/sudoers (root, 440) is not accessible by other users
+
+--- Private key permissions ---
+  [INFO]     No private key files found in common locations
+
+========================================================
+  3) SETUID / SETGID BINARIES
+========================================================
+
+--- setuid binaries (find / -perm -4000) ---
+  [OK]       /usr/bin/gpasswd (known/expected setuid binary)
+  [OK]       /usr/bin/chfn (known/expected setuid binary)
+  [OK]       /usr/bin/chsh (known/expected setuid binary)
+  [OK]       /usr/bin/fusermount3 (known/expected setuid binary)
+  [OK]       /usr/bin/passwd (known/expected setuid binary)
+  [OK]       /usr/bin/umount (known/expected setuid binary)
+  [OK]       /usr/bin/su (known/expected setuid binary)
+  [OK]       /usr/bin/mount (known/expected setuid binary)
+  [WARN]     /usr/bin/sudo.ws is setuid and NOT on the known-good list — verify it is legitimate
+  [WARN]     /usr/lib/dbus-1.0/dbus-daemon-launch-helper is setuid and NOT on the known-good list — verify it is legitimate
+  [OK]       /usr/lib/openssh/ssh-keysign (known/expected setuid binary)
+  [WARN]     /usr/lib/landscape/apt-update is setuid and NOT on the known-good list — verify it is legitimate
+  [WARN]     /usr/lib/cargo/bin/sudo is setuid and NOT on the known-good list — verify it is legitimate
+  [WARN]     /usr/lib/cargo/bin/su is setuid and NOT on the known-good list — verify it is legitimate
+
+--- setgid binaries (find / -perm -2000) ---
+  [INFO]     /usr/bin/chage (setgid)
+  [INFO]     /usr/bin/ssh-agent (setgid)
+  [INFO]     /usr/bin/crontab (setgid)
+  [INFO]     /usr/bin/expiry (setgid)
+  [INFO]     /usr/sbin/unix_chkpwd (setgid)
+  [INFO]     /usr/sbin/pam_extrausers_chkpwd (setgid)
+
+========================================================
+  4) WORLD-WRITABLE FILES
+========================================================
+
+--- World-writable regular files (excluding /proc, /sys, /dev) ---
+  [WARN]     /init is world-writable — restrict write access
+
+--- World-writable directories without sticky bit ---
+  [WARN]     /mnt/c is world-writable and has no sticky bit — any user can delete others' files here
+
+========================================================
+  5) INSECURE BACKUP FILES / DIRECTORIES
+========================================================
+
+--- Stray copies of sensitive files ---
+  [WARN]     /etc/shadow- exists (perms 640) — verify this backup copy is necessary
+  [CRITICAL] /etc/passwd- exists and is readable by other users (perms 644) — copy of a sensitive file
+
+--- Backup directories ---
+  [WARN]     /var/backups is accessible by other users (perms 755) — restrict access to backups
+
+========================================================
+  Review complete.
+  Legend: [OK] = good  [WARN] = needs review  [CRITICAL] = fix immediately
+========================================================
