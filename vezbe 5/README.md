@@ -99,7 +99,7 @@ Ocekivani izlaz:
 ### Korak 1 - Privilege Escalation
 
 ```powershell
-python script.py http://localhost:8000 user1 user1
+python privilege_excalation.py http://localhost:8000 user1 user1
 ```
 
 Skript se prijavljuje kao `user1`, postavlja XSS payload u opis profila i ceka da admin browser poseti pocetnu stranicu.

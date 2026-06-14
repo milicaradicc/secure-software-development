@@ -1,6 +1,6 @@
 """
 Usage:
-  python3 script.py http://localhost:8000 user1 user1
+  python3 privilege_excalation.py http://localhost:8000 user1 user1
 """
 import sys
 import urllib.parse
