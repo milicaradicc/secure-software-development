@@ -9,6 +9,16 @@
 
 ---
 
+## Korak 0 - Login Bypass
+
+```powershell
+python login_bypass.py http://localhost:8000
+```
+
+Skripta automatski isprobava poznate lab kredencijale i SQL injection payload-e nad `/login.php`, zatim ispisuje dobijeni `PHPSESSID`.
+
+---
+
 ## Korak 1 — Privilege Escalation (admin cookie)
 
 ```powershell
