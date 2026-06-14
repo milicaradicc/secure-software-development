@@ -72,6 +72,20 @@ Primer pokretanja:
 python login_bypass.py http://localhost:8000
 ```
 
+Pored pojedinacne skripte, ranjivost je ukljucena i u konacni automatski exploit chain kroz `exploit_chain.py`. Ta skripta spaja sva tri dela zadatka:
+
+```text
+login bypass -> user sesija -> admin sesija (Stored XSS) -> RCE (SSTI)
+```
+
+Pokretanje kompletnog lanca:
+
+```powershell
+python exploit_chain.py http://localhost:8000
+```
+
+U kombinovanom lancu Login Bypass korak se koristi da skripta dobije pocetnu korisnicku sesiju. Nakon toga se ista sesija koristi za postavljanje XSS payload-a u opis profila, cime se nastavlja privilege escalation korak.
+
 ---
 
 ## 4. Rezultat
@@ -97,6 +111,20 @@ U kombinovanoj skripti `exploit_chain.py`, ovaj korak je spojen sa preostala dva
 python exploit_chain.py http://localhost:8000
 ```
 
+Primer pocetka izvrsavanja kombinovane skripte:
+
+```text
+[*] Target: http://localhost:8000
+[*] Trying lab credentials and bypass payloads against /login.php...
+[+] Login bypass succeeded
+[+] Username: 'user1'
+[+] Password: 'user1'
+[+] Verified on: http://localhost:8000/index.php
+[=] User PHPSESSID: <vrednost>
+```
+
+Nakon toga skripta automatski nastavlja na stored XSS korak, ceka administratorov cron/browser i zatim koristi ukradeni admin `PHPSESSID` za RCE.
+
 ---
 
 ## 5. Preporuke za otklanjanje
@@ -108,4 +136,3 @@ python exploit_chain.py http://localhost:8000
 | Admin nalog dostupan običnim login tokom | Ograničiti admin pristup dodatnim kontrolama i odvojiti inicijalizaciju admin naloga |
 | Nema zaštite od pogađanja lozinki | Dodati rate limiting, lockout i monitoring neuspešnih pokušaja |
 | Slaba operativna praksa | Tajne i početne lozinke čuvati van repozitorijuma i menjati pri prvom pokretanju |
-
