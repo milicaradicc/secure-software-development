@@ -1,0 +1,28 @@
+# Build artefakti
+oblak
+oblak.exe
+oblak-server
+oblak-server.exe
+
+# Baza i runtime podaci
+*.db
+functions/
+logs/
+
+# Tajne i sertifikati
+.env
+certs/server.key
+
+# Firecracker artefakti
+*.ext4
+
+# IDE
+.idea/
+.vscode/
+
+# Go
+vendor/
+
+# OS
+.DS_Store
+Thumbs.db
