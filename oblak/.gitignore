@@ -11,7 +11,7 @@ logs/
 
 # Tajne i sertifikati
 .env
-certs/server.key
+certs/
 
 # Firecracker artefakti
 *.ext4
