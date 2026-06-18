@@ -1,0 +1,364 @@
+Results:
+
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:69] - G703 (CWE-22): Path traversal via taint analysis (Confidence: HIGH, Severity: HIGH)
+    68:     if caPath := os.Getenv("OBLAK_CA_CERT"); caPath != "" {
+  > 69:         caCert, err := os.ReadFile(caPath)
+    70:         if err != nil {
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/verifier/bandit.go:22] - G204 (CWE-78): Subprocess launched with variable (Confidence: HIGH, Severity: MEDIUM)
+    21: func RunBandit(scriptPath string) models.BanditResult {
+  > 22:     cmd := exec.Command("bandit", "-f", "json", "-l", "-i", scriptPath)
+    23:     var out bytes.Buffer
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/verifier/antivirus.go:26] - G204 (CWE-78): Subprocess launched with variable (Confidence: HIGH, Severity: MEDIUM)
+    25: func runClamscan(path string) (models.AVResult, error) {
+  > 26:     cmd := exec.Command("clamscan", "--no-summary", path)
+    27: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/rootfs.go:28] - G204 (CWE-78): Subprocess launched with variable (Confidence: HIGH, Severity: MEDIUM)
+    27:     defer func() {
+  > 28:         exec.Command("sudo", "umount", mountPoint).Run()
+    29:         os.Remove(mountPoint)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/rootfs.go:23] - G204 (CWE-78): Subprocess launched with variable (Confidence: HIGH, Severity: MEDIUM)
+    22: 
+  > 23:     mountCmd := exec.Command("sudo", "mount", "-o", "loop", rootfsPath, mountPoint)
+    24:     if out, err := mountCmd.CombinedOutput(); err != nil {
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/firecracker.go:80-84] - G204 (CWE-78): Subprocess launched with a potential tainted input or cmd arguments (Confidence: HIGH, Severity: MEDIUM)
+    79: 
+  > 80:     vm.process = exec.Command(
+  > 81:         FirecrackerBin,
+  > 82:         "--api-sock", vm.SocketPath,
+  > 83:         "--level", "Warning",
+  > 84:     )
+    85:     vm.process.Stdout = logFile
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/verifier/pipeline.go:27] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    26: func checkDangerousPatterns(scriptPath string) (bool, string) {
+  > 27:     content, err := os.ReadFile(scriptPath)
+    28:     if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/verifier/llm.go:54] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    53: func LLMReview(scriptPath string) models.LLMResult {
+  > 54:     content, err := os.ReadFile(scriptPath)
+    55:     if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/rootfs.go:60] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    59: 
+  > 60:     out, err := os.Create(dst)
+    61:     if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/rootfs.go:54] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    53: func copyFile(src, dst string) error {
+  > 54:     in, err := os.Open(src)
+    55:     if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/server/main.go:193] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    192: 
+  > 193:     content, _ := os.ReadFile(scriptPath)
+    194:     fileHash := fmt.Sprintf("%x", sha256.Sum256(content))
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:249] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    248:         if reqPath != "" {
+  > 249:             reqFile, err := os.Open(reqPath)
+    250:             if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:239] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    238: 
+  > 239:         scriptFile, err := os.Open(scriptPath)
+    240:         if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:69] - G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+    68:     if caPath := os.Getenv("OBLAK_CA_CERT"); caPath != "" {
+  > 69:         caCert, err := os.ReadFile(caPath)
+    70:         if err != nil {
+
+Autofix: Consider using os.Root to scope file access under a fixed root (Go >=1.24). Prefer root.Open/root.Stat over os.Open/os.Stat to prevent directory traversal.
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/verifier/bandit.go:25] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    24:     cmd.Stdout = &out
+  > 25:     cmd.Run() 
+    26: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/verifier/antivirus.go:57] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    56:     case <-time.After(30 * time.Second):
+  > 57:         cmd.Process.Kill()
+    58:         return models.AVResult{Clean: false, Detail: "AV timeout"}, nil
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/rootfs.go:71] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    70: func CleanupRootfs(vmID string) {
+  > 71:     os.Remove(fmt.Sprintf("/tmp/rootfs_%s.ext4", vmID))
+    72: }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/rootfs.go:47] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    46: 
+  > 47: 		os.Chown(dst, 1000, 1000)
+    48:     }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/rootfs.go:29] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    28:         exec.Command("sudo", "umount", mountPoint).Run()
+  > 29:         os.Remove(mountPoint)
+    30:     }()
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/rootfs.go:28] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    27:     defer func() {
+  > 28:         exec.Command("sudo", "umount", mountPoint).Run()
+    29:         os.Remove(mountPoint)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/firecracker.go:178] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    177:     os.Remove(vm.SocketPath)
+  > 178:     os.Remove(vm.LogPath)
+    179: }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/firecracker.go:177] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    176:     os.Remove(vm.RootfsPath)
+  > 177:     os.Remove(vm.SocketPath)
+    178:     os.Remove(vm.LogPath)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/firecracker.go:176] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    175:     }
+  > 176:     os.Remove(vm.RootfsPath)
+    177:     os.Remove(vm.SocketPath)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/firecracker.go:173] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    172:         case <-time.After(3 * time.Second):
+  > 173:             vm.process.Process.Kill()
+    174:         }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/firecracker.go:167] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    166:     if vm.process != nil {
+  > 167:         vm.process.Process.Signal(os.Interrupt)
+    168:         done := make(chan error, 1)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/firecracker.go:150] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    149:                         if len(parts) == 2 {
+  > 150:                             fmt.Sscanf(strings.TrimSpace(parts[1]), "%d", &exitCode)
+    151:                         }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/orchestrator/firecracker.go:74] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    73: func (vm *VM) startProcess() error {
+  > 74:     os.MkdirAll(SocketBase, 0750)
+    75:     logFile, err := os.Create(vm.LogPath)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/internal/audit/audit.go:20] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    19: func Init() {
+  > 20:     os.MkdirAll("./logs", 0750)
+    21:     f, err := os.OpenFile("./logs/audit.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/server/main.go:295] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    294: 
+  > 295:     os.RemoveAll(fn.Path)
+    296:     database.DB.Delete(&fn)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/server/main.go:197] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    196:     if reqFile, err := c.FormFile("requirements"); err == nil {
+  > 197:         c.SaveUploadedFile(reqFile, filepath.Join(funcDir, "requirements.txt"))
+    198:     }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/server/main.go:185] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    184:     funcDir := filepath.Join(StoragePath, funcID)
+  > 185:     os.MkdirAll(funcDir, 0750)
+    186: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/server/main.go:36] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    35:     audit.Init()
+  > 36:     os.MkdirAll(StoragePath, 0750)
+    37: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/server/main.go:32] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    31: func main() {
+  > 32:     godotenv.Load()
+    33:     auth.Init()
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:453] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    452:         var confirm string
+  > 453:         fmt.Scan(&confirm)
+    454:         if confirm != "y" && confirm != "Y" {
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:436] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    435:         }
+  > 436:         tw.Flush()
+    437:         return nil
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:416] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    415:         var functions []map[string]any
+  > 416:         json.NewDecoder(r.Body).Decode(&functions)
+    417: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:352] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    351:         var result map[string]any
+  > 352:         json.NewDecoder(resp.Body).Decode(&result)
+    353: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:279] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    278:         var result map[string]any
+  > 279:         json.NewDecoder(resp.Body).Decode(&result)
+    280: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:257] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    256:         }
+  > 257:         w.Close()
+    258: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:255] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    254:             reqPart, _ := w.CreateFormFile("requirements", "requirements.txt")
+  > 255:             io.Copy(reqPart, reqFile)
+    256:         }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:246] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    245:         part, _ := w.CreateFormFile("script", filepath.Base(scriptPath))
+  > 246:         io.Copy(part, scriptFile)
+    247: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:237] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    236: 
+  > 237:         w.WriteField("name", name)
+    238: 
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:194] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    193:             fmt.Print("Password: ")
+  > 194:             fmt.Scan(&password)
+    195:         }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:190] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    189:             fmt.Print("Username: ")
+  > 190:             fmt.Scan(&username)
+    191:         }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:175] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    174:         token := result["access_token"].(string)
+  > 175:         saveConfig(Config{Token: token, Username: username, Server: server})
+    176:         fmt.Printf("✓ Ulogovani kao %s na %s\n", username, server)
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:157] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    156:             fmt.Print("Password: ")
+  > 157:             fmt.Scan(&password)
+    158:         }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:153] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    152:             fmt.Print("Username: ")
+  > 153:             fmt.Scan(&username)
+    154:         }
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:134] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    133:     var result map[string]any
+  > 134:     json.NewDecoder(resp.Body).Decode(&result)
+    135:     return result, resp.StatusCode, nil
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:45] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    44:     }
+  > 45:     json.Unmarshal(data, &cfg)
+    46:     return cfg, nil
+
+Autofix: 
+
+[/mnt/c/Users/Lenovo/Desktop/projects/secure-software-development/oblak/cmd/cli/main.go:34] - G104 (CWE-703): Errors unhandled (Confidence: HIGH, Severity: LOW)
+    33: func saveConfig(cfg Config) error {
+  > 34:     os.MkdirAll(filepath.Dir(configPath()), 0700)
+    35:     data, _ := json.Marshal(cfg)
+
+Autofix: 
+
+Summary:
+  Gosec  : dev
+  Files  : 14
+  Lines  : 1755
+  Nosec  : 0
+  Issues : 50
+
