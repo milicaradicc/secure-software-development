@@ -1,7 +1,7 @@
 # Secure Deployment Environment Audit
 
 Defensive Linux hardening review helper inspired by the assignment brief in
-`Secure deployment environment`, with a one-student implementation scope.
+`Secure deployment environment`.
 
 The tool is read-only. It uses local, legitimate system commands and
 configuration files to summarize potentially unsafe deployment settings. It does
@@ -10,7 +10,7 @@ offensive actions.
 
 ## Implemented Scope
 
-For one student, this project implements one larger functional unit:
+This part of the project implements one larger functional unit:
 
 **Network exposure and remote administration review**
 
